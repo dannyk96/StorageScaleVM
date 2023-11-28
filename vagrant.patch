@@ -1,0 +1,13 @@
+--- a/virtualbox/Vagrantfile
++++ b/virtualbox/Vagrantfile
+@@ -33,6 +33,10 @@ load File.expand_path('../../shared/Vagrantfile.common', __FILE__)
+ # Customize configuration specific settings
+ Vagrant.configure("2") do |config|
+
++  # DJK
++  #config.ssh.keys_only = false
++  config.ssh.insert_key = false
++
+   # Use the Vagrant box prepared for Storage Scale
+   config.vm.box     = "StorageScale_base"
+   config.vm.box_url = "./prep-box/StorageScale_base.box"
