@@ -4,8 +4,10 @@
 # If run under powershell, I think there is a conflict between windows linux subsystem and opensssl ?
 
 if test -d StorageScaleVagrant; then
+   echo "change directory"
    cd StorageScaleVagrant
 fi
+cd StorageScaleVagrant
 echo "*** copying a download of Storage Scale Dedveloper edition"
 #
 # Really we should be getting this zipfile direct from IBM ?
