@@ -13,6 +13,6 @@ echo "copying it a download of Storage Scale Dedveloper edition"
 #
 # Really we should be getting thius direct from IBM ?
 #
-pushd software && unzip ~/Downloads/Storage_Scale_Developer-5.1.8.2-x86_64-Linux.zip
+(cd software && unzip ~/Downloads/Storage_Scale_Developer-5.1.8.2-x86_64-Linux.zip)
 
 patch  -p1 -i ../vagrantfile8.patch
