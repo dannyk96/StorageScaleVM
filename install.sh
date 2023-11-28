@@ -17,5 +17,6 @@ echo "copying a download of Storage Scale Dedveloper edition"
 
 patch  -p1 -i ../vagrantfile8.patch
 
-cd virtualbox/PrepBox
+cd virtualbox/prep-box
 time vagrant up
+ls -lrt
