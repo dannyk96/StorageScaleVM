@@ -22,5 +22,5 @@ patch  -p1 -i ../vagrant.patch
 if test -d disk; then
     rm -rf disk
 fi
-
+pwd
 time vagrant up
