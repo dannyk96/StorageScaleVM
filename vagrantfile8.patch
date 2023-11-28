@@ -1,0 +1,16 @@
+--- a/shared/Vagrantfile8.rpms
++++ b/shared/Vagrantfile8.rpms
+@@ -92,6 +92,13 @@ Vagrant.configure('2') do |config|
+         zlib-devel\
+         epel-release
+     "
++  # Dan Kidger 6/11/23
++  # (Peer certificate cannot be authenticated with given CA certificates)
++    config.vm.provision "shell",
++    name:   "Turn off security for curl",
++    inline: "
++      /usr/bin/echo 'sslverify=0' >> /etc/dnf/dnf.conf
++    "
+
+   # Contain Ansible package rename
+   config.vm.provision "shell",
