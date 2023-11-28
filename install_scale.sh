@@ -14,8 +14,11 @@ echo "*** copying a download of Storage Scale Dedveloper edition"
 #
 (cd software && unzip -o ~/Downloads/Storage_Scale_Developer-5.1.8.2-x86_64-Linux.zip)
 
+
 echo "*** Hack : stop the regeneration of SSL Vagrant keys. They end up in the wrong file format"
 patch  -p1 -i ../vagrant.patch
+
+cd virtualbox
 
 # clean up step 
 # but be careful if the vmdk files are still there as they might muild up in VirtualBox ?
