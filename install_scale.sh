@@ -12,9 +12,10 @@ echo "*** copying a download of Storage Scale Dedveloper edition"
 #
 # Really we should be getting this zipfile direct from IBM ?
 #
-if test -n 
-(cd software && unzip -o ~/Downloads/Storage_Scale_Developer-5.1.8.2-x86_64-Linux.zip)
-
+$BASE="Storage_Scale_Developer-5.1.8.2-x86_64-Linux"
+if !test -f software/$(BASE)-Linux-install; then
+   (cd software && unzip -o ~/Downloads/$BASE.zip)
+fi
 
 echo "*** Hack : stop the regeneration of SSL Vagrant keys. They end up in the wrong file format"
 patch  -p1 -i ../vagrant.patch
