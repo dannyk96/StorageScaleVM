@@ -16,3 +16,6 @@ echo "copying a download of Storage Scale Dedveloper edition"
 (cd software && unzip -o ~/Downloads/Storage_Scale_Developer-5.1.8.2-x86_64-Linux.zip)
 
 patch  -p1 -i ../vagrantfile8.patch
+
+cd virtualbox/PrepBox
+time vagrant up
