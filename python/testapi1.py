@@ -2,7 +2,7 @@ import requests
 #import json
 #import sys
 
-server = 'https://127.0.0.1:47443/'
+server = 'https://127.0.0.1:8888/'
 ss_auth=('admin','admin001')
 #from auth_gren import *      # REST API username
 
