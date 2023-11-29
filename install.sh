@@ -3,7 +3,7 @@
 # I really would have prefered to do this using Ansible playbooks
 # but for now lats just script it in bash
 #
-mkdir dan && cd dan
+#mkdir dan && cd dan
 echo "*** Checkout the latest copy of StorwageScaleVagrant"
 #  use https or ssh ?
 git clone https://github.com/IBM/StorageScaleVagrant.git
