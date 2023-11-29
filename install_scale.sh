@@ -12,8 +12,8 @@ echo "*** copying a download of Storage Scale Dedveloper edition"
 #
 # Really we should be getting this zipfile direct from IBM ?
 #
-$BASE="Storage_Scale_Developer-5.1.8.2-x86_64-Linux"
-if !test -f software/$(BASE)-Linux-install; then
+BASE="Storage_Scale_Developer-5.1.8.2-x86_64-Linux"
+if [ ! -f software/$(BASE)-Linux-install ]; then
    (cd software && unzip -o ~/Downloads/$BASE.zip)
 fi
 
