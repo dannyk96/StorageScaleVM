@@ -14,7 +14,7 @@ echo "*** copying a download of Storage Scale Dedveloper edition"
 #
 BASE="Storage_Scale_Developer-5.1.8.2-x86_64-Linux"
 ls -lrt software
-if [ ! -f software/$(BASE)-install ]; then
+if [ ! -f software/${BASE}-install ]; then
    (cd software && unzip -o ~/Downloads/$BASE.zip)
 fi
 
