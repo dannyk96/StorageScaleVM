@@ -19,7 +19,9 @@ time vagrant up > install_prepbox.log
 ls -lrt
 echo "*** Package up this VM into a Vagrent 'box'"
 time vagrant package StorageScale_base --output StorageScale_base.box
+
 # optional step
-# vagrant destroy
+vagrant destroy -f
+
 echo "*** All Done"
 
