@@ -3,22 +3,13 @@
 # I really would have prefered to do this using Ansible playbooks
 # but for now lats just script it in bash
 #
-#mkdir dan && cd dan
-echo "*** Checkout the latest copy of StorwageScaleVagrant"
-#  use https or ssh ?
-git clone https://github.com/IBM/StorageScaleVagrant.git
-cd StorageScaleVagrant
 
 
-patch  -p1 -i ../vagrantfile8.patch
+time ./install_basebox.sh
 
-echo "*** Fire up Vagrant to cearte the base o/s image"
-cd virtualbox/prep-box
-time vagrant up > install_prepbox.log
+time ./install_scale.sh
 
-ls -lrt
-echo "*** Package up this VM into a Vagrent 'box'"
-time vagrant package StorageScale_base --output StorageScale_base.box
-# optional step
-# vagrant destroy
+# future
+# some clever restapi stuff etc
+
 echo "*** All Done"
