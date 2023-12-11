@@ -27,6 +27,8 @@ time ./install_basebox.sh
 # 81   Triggers      : 2* mmcrfileset (limit 1024 files(, 850*touch , 950*touch
 # 99   Quota limits with the cli : mmcheckquota, cli/runtask QUOTA
 
+# consider here the possibility of disabling the IBM demos, or at least adding a substitue set of my own?
+
 time ./install_scale.sh
 
 # time ./install_restapi.sh
