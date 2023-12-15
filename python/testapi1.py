@@ -3,7 +3,9 @@ import requests
 #import sys
 
 server = 'https://127.0.0.1:8888/'
+server = 'https://127.0.0.1:47443/'
 ss_auth=('admin','admin001')
+ss_auth=('performance','monitor')
 #from auth_gren import *      # REST API username
 
 #debug=False
