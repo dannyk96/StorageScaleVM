@@ -67,9 +67,11 @@ vagrant destroy -f
 #    rm -rf disk
 #fi
 pwd
+
 time vagrant up >>install.log
 rc=$?
 echo "*** all done"
+
 if [ $rc -eq 0 ] cat <<EOF 
      now proceed with:
      - testing the GUI 

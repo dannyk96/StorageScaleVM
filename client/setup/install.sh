@@ -120,6 +120,7 @@ echo $LINE
 echo "start this one node cluster and do a few checks"
 echo $LINE
 export PATH=$PATH:/usr/lpp/mmfs/bin
+mmchlicense server --accept -N `hostname`    # or  ${name}01
 mmlscluster
 uptime
 
