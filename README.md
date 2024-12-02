@@ -9,6 +9,11 @@ This is a great gem - much faster that `vagrant ssh`
 ```
 alias fastssh="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i .vagrant/machines/*/virtualbox/private_key -p 2200 vagrant@127.0.0.1"
 ```
+for the Scale VM:
+```
+alias sshm1="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i StorageScaleVagrant/virtualbax/.vagrant/machines/*/virtualbox/private_key -p 2222 vagrant@127.0.0.1"
+
+```
 
 then jsut type `fastssh`
 

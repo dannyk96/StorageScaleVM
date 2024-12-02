@@ -29,7 +29,7 @@ if [ ! -f software/${BASE}-install ]; then
 fi
 
 cd virtualbox 
-echo "*** save a copy of the Vagrantfiel before I first make any changes"
+echo "*** save a copy of the Vagrantfile before I first make any changes"
 if [ ! -f Vagrantfile.save ]; then
   cp Vagrantfile Vagrantfile.save
 fi
@@ -38,7 +38,7 @@ echo "*** add a line to use version \$VERSION=$VERSION of Scale"
 sed -i "/StorageScale_version =/a\$StorageScale_version = \"$VERSION\"" ../shared/Vagrantfile.common
 
 
-echo "*** change port 8888 to 8443 to avoid clash with Jupyter Notebooks"
+echo "*** change port 8888 to 4438 to avoid clash with Jupyter Notebooks"
 sed -i 's/host: 8888/host: 4438/' Vagrantfile
 # or instead allow use the `auto_correct: true` option of config.vm.network ?
 
@@ -48,7 +48,7 @@ sed -i 's|/vagrant/demo/script.sh|#/vagrant/demo/script.sh|' Vagrantfile
 
 echo "*** We need to enable the GUI user here (was much later in demo/script-80,sh)"
 # so sed it into the end of install/script-05.sh (after sudo /usr/lpp/mmfs/gui/cli/initgui)
-sed '/\/cli\/initgui/asudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' setup/install/script-05.sh
+sed '/\/cli\/initgui/asudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' StorageScaleVagrant/setup/install/script-05.sh
 
 # Now we need to patch the file to point to this version of Storage Scale
 # StorageScaleVagrant/shared/Vagrantfile.common
@@ -72,7 +72,12 @@ time vagrant up >>install.log
 rc=$?
 echo "*** all done"
 
-if [ $rc -eq 0 ] cat <<EOF 
+echo << EOF
+try this:
+alias sshm1="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i StorageScaleVagrant/virtualbox/.vagrant/machines/*/virtualbox/private_key -p 2222 vagrant@127.0.0.1"
+EOF
+
+if [ $rc -eq 0 ]; cat <<EOF 
      now proceed with:
      - testing the GUI 
      - testing the RestAPI
