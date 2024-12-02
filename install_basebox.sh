@@ -33,6 +33,9 @@ if [ ! -f StorageScale_base.box ]; then
    rm StorageScale_base.box
 fi
 time vagrant package StorageScale_base --output StorageScale_base.box
+vagrant box add StorageScale_base.box --name StorageScale_base
+echo "* You can delete StorageScale_base.box as it is no longer needed"
+echo "* Likewise this VM: prep-box_StorageScale_base_xxx_yy" can be deleted with 'vagrant destoy -f'
 
 # optional step
 # time vagrant destroy -f
