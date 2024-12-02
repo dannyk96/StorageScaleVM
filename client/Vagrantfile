@@ -42,6 +42,6 @@ config.vm.provision "shell",
 config.vm.provision "shell",
     name:   "Now ssh in and run our install.sh",
     inline: "
-      /tmp/setup/install.sh
+      bash /tmp/setup/install.sh
     "
 end
