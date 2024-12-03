@@ -2,6 +2,8 @@
 
 cd client
 
+cp ../Storage_Scale_Developer-*-Linux.zip setup
+
 vagrant destroy -f 
 vagrant up  >> install_client.log
 
