@@ -4,3 +4,4 @@ client/setup/Storage_Scale_Developer-*-Linux-install
 client/.vagrant/
 install.log
 
+*.pub
