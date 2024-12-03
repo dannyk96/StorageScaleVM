@@ -66,8 +66,8 @@ sshc df -t gpfs
 
 section "now test that both side can write a file and the other see it"
 SHARED=/ibm/fs1/vagrant
-sshm1 mkdir $SHARED
-sshm1 chown vagrant:vagrant $SHARED
+sshm1 sudo mkdir $SHARED
+sshm1 sudo chown vagrant:vagrant $SHARED
 
 sshm1 cp /etc/hosts $SHARED/hosts_m1
 sshc  cp /etc/hosts $SHARED/hosts_wilma01
