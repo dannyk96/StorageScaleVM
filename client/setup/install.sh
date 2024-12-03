@@ -72,10 +72,14 @@ echo "Autodetect the version of Scale and unzip and auto-unpack the tarball"
 echo $LINE
 
 cd /tmp/setup
-TARBALL=`ls Storage_Scale_Developer*.zip`
-unzip  $TARBALL
 
+TARBALL=`ls Storage_Scale_Developer*.zip`
 export VERSION=`echo $TARBALL |cut -d'-' -f2`
+INSTALL="./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install"
+if [ ! -f $INSTALL ]; then 
+  unzip  $TARBALL
+fi 
+
 bash ./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install  --silent >>tarball_unpack.log
 
 
