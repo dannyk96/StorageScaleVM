@@ -38,20 +38,20 @@ if [ ! -f Vagrantfile.save ]; then
 fi
 
 echo "*** add a line to use version \$VERSION=$VERSION of Scale"
-sed -i "/StorageScale_version =/a\$StorageScale_version = \"$VERSION\"" ../shared/Vagrantfile.common
+sed -i.bak "/StorageScale_version =/a\$StorageScale_version = \"$VERSION\"" ../shared/Vagrantfile.common
 
 
 echo "*** change port 8888 to 4438 to avoid clash with Jupyter Notebooks"
-sed -i 's/host: 8888/host: 4438/' Vagrantfile
+sed -i.bak 's/host: 8888/host: 4438/' Vagrantfile
 # or instead allow use the `auto_correct: true` option of config.vm.network ?
 
 echo "*** disable running of the demos after installing Scale"
 # We will do this later one by one
-sed -i 's|/vagrant/demo/script.sh|#/vagrant/demo/script.sh|' Vagrantfile
+sed -i.bak 's|/vagrant/demo/script.sh|#/vagrant/demo/script.sh|' Vagrantfile
 
 echo "*** We need to enable the GUI user here (was much later in demo/script-80,sh)"
 # so sed it into the end of install/script-05.sh (after sudo /usr/lpp/mmfs/gui/cli/initgui)
-sed '/\/cli\/initgui/asudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' StorageScaleVagrant/setup/install/script-05.sh
+sed -i.bak '/\/cli\/initgui/asudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' StorageScaleVagrant/setup/install/script-05.sh
 
 # Now we need to patch the file to point to this version of Storage Scale
 # StorageScaleVagrant/shared/Vagrantfile.common
