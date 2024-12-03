@@ -18,11 +18,19 @@ echo vagrant plugin install vagrant-vbguest
 # caveat : some employers block this URL :-(
 # from https://www.virtualbox.org/wiki/Downloads
 
+echo "*** Install the Base VM image, including Scale''s prerequisites"
 time ./install_basebox.sh
 
+echo "*** Install  a VM with Spectrum Scale"
 time ./install_scale.sh
 
+echo "*** Intsall a client (using the same basebox VM image"
+time ./install_client.sh
 
+# is there anything to intsall - or is it a set of demo restapi calls?
+#
+# Think too about using the RestAPI to set multicluster - that would be very cool
+#
 echo " time ./install_restapi.sh"
 
 # future

@@ -3,7 +3,7 @@
 cd client
 
 vagrant destory -f 
-vagrant up 
+vagrant up  >> install_client.log
 
 cat <<EOF
 try:
