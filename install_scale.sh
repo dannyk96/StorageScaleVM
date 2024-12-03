@@ -3,11 +3,14 @@
 # Recommended to run this in 'git bash' on Windows
 # If run under powershell, I think there is a conflict between windows linux subsystem and opensssl ?
 
-
-if test -d StorageScaleVagrant; then
-   echo "change directory"
-   cd StorageScaleVagrant
+# Have the Vagrant scripts been downlaoded yet?
+if [ ! -d StorageScaleVagrant ]; then
+  git clone https://github.com/IBM/StorageScaleVagrant.git
 fi
+cd StorageScaleVagrant
+
+
+
 echo "*** copying a download of Storage Scale Dedveloper edition"
 #
 # Really we should be getting this zipfile direct from IBM ?

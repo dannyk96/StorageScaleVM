@@ -5,12 +5,11 @@ function section () {
    echo "==================================================================="
    echo "                  $@"
    echo "==================================================================="
-}}
+}
 
 PATH=$PATH:"/c/Program Files/Oracle/VirtualBox/"
 vboxmanage list vms
 vboxmanage list hdds
-exit
 
 # Install Vagrant
 # from https://developer.hashicorp.com/vagrant/install?product_intent=vagrant
@@ -18,7 +17,6 @@ exit
 # this is for virtualbox
 echo vagrant plugin install vagrant-vbguest
 # this is perhaps more fro clouds with dynamic IP addrresses?
-echo vagrant plugin install vagrant-vbguest
 
 #Install Virtualbox
 # caveat : some employers block this URL :-(
@@ -26,7 +24,7 @@ echo vagrant plugin install vagrant-vbguest
 
 
 section "Install the Base VM image, including Scale''s prerequisites"
-time ./install_basebox.sh
+#time ./install_basebox.sh
 
 
 section "Install  a VM with Spectrum Scale"

@@ -2,7 +2,7 @@
 
 cd client
 
-vagrant destory -f 
+vagrant destroy -f 
 vagrant up  >> install_client.log
 
 cat <<EOF
