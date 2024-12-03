@@ -73,7 +73,14 @@ echo $LINE
 
 cd /tmp/setup
 
+# I must check that this tarball exists and abort if it does not
+#
 TARBALL=`ls Storage_Scale_Developer*.zip`
+echo "ls -l $TARBALL"
+if [ ! -f $TARBALL ]; then 
+   echo "*** Tarball $TARBALL does not exist. Aborting!"
+   exit 1
+fi
 export VERSION=`echo $TARBALL |cut -d'-' -f2`
 INSTALL="./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install"
 if [ ! -f $INSTALL ]; then 
