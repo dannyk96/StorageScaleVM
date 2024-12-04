@@ -15,11 +15,11 @@ function section () {
 #
 function sshm1 () {
     echo "  $@" >&2
-    ssh -o StrictHostKeyChecking=no  -i StorageScaleVagrant/virtualbox/.vagrant/machines/*/virtualbox/private_key -p 2222 vagrant@127.0.0.1 $@
+    ssh -o StrictHostKeyChecking=no  -i StorageScaleVagrant/virtualbox/.vagrant/machines/*/virtualbox/private_key  vagrant@10.1.2.11 $@
 }
 function sshc () {
     echo "  $@" >&2
-    ssh -o StrictHostKeyChecking=no -i client/.vagrant/machines/*/virtualbox/private_key -p 2200 vagrant@127.0.0.1 $@
+    ssh -o StrictHostKeyChecking=no -i client/.vagrant/machines/*/virtualbox/private_key vagrant@10.1.2.21 $@
 }
 
 
