@@ -75,10 +75,7 @@ time vagrant up >>install.log
 rc=$?
 echo "*** all done"
 
-echo << EOF
-try this:
-alias sshm1="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i StorageScaleVagrant/virtualbox/.vagrant/machines/*/virtualbox/private_key -p 2222 vagrant@127.0.0.1"
-EOF
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i StorageScaleVagrant/virtualbox/.vagrant/machines/*/virtualbox/private_key -p 2222 vagrant@127.0.0.1 mmlscluster
 
 if [ $rc -eq 0 ]; cat <<EOF 
      now proceed with:
