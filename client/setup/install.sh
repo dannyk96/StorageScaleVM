@@ -26,7 +26,7 @@ sudo dnf -y install unzip         # to unpack the Scale tarball
 #  not so sure wht we need this ?
 # I suspect it fixes a missing /usr/local/bin from PATH ?
 
-cat <<EOF | tee -a /etc/sudoers.d/spectrumscale
+cat <<EOF | sudo tee -a /etc/sudoers.d/spectrumscale
 # Provisioned by Vagrant `date`
 
 # Add Storage Scale executables
@@ -40,7 +40,7 @@ EOF
 #
 
 #sudo bash -c 'cat <<EOF >>/etc/hosts
-cat <<EOF  | tee -a /etc/hosts
+cat <<EOF  | sudo tee -a /etc/hosts
 
 #### added by $0 via vagrant on `date`   ####
 127.0.0.1  localhost.localdomain localhost
@@ -87,29 +87,37 @@ if [ ! -f $INSTALL ]; then
   unzip  $TARBALL
 fi 
 
-bash ./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install  --silent >>tarball_unpack.log
-
-
+SS="/usr/lpp/mmfs/$VERSION/ansible-toolkit/spectrumscale"
+echo "unpack the tarball only if $SS does not yet exist"
+if [ ! -f $SS ]; then
+   sudo bash ./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install  --silent >>tarball_unpack.log
+fi 
 
 echo $LINE
 echo " Configure the Storage Scale installer then run it"
 echo $LINE
 
-SS="/usr/lpp/mmfs/$VERSION/ansible-toolkit/spectrumscale"
 
 echo "===> Setup management node (m1) as Storage Scale Install Node"
-$SS setup -s $INSTALL_NODE --storesecret
+sudo $SS setup -s $INSTALL_NODE --storesecret
 
-$SS config gpfs -c ${name}_site     # storage cluster  is already defined as 'demo' with node 'm1'
+sudo $SS config gpfs -c ${name}_site     # storage cluster  is already defined as 'demo' with node 'm1'
 # note one day I might want  -g - with gui to show client activity?
-$SS node add -a -q -m ${name}01.example.com     # a=admin, q=quorum, m=manager
+sudo $SS node add -a -q -m ${name}01.example.com     # a=admin, q=quorum, m=manager
 
 
-$SS callhome disable       # disbale to avoid supurious warnings
+sudo $SS callhome disable       # disbale to avoid supurious warnings
 
-$SS node list
-time $SS install > install_scale.log
+echo "*** PATH=$PATH"
+echo "current user is `id`"
+sudo $SS node list
+# I think we are already root, but sudo picks up /usr/local/bin ?
+time sudo $SS install > install_scale.log
 
+echo "check if the Installer succeeded in unpack the RPMS"
+if [-f /usr/lpp/mmfs/bin/mmstartup]; then
+  echo "*** Storage Scale binaries not found! exiting"
+fi
 #
 # Now lets fire up Storage Scale !
 #
@@ -131,7 +139,7 @@ echo $LINE
 echo "start this one node cluster and do a few checks"
 echo $LINE
 export PATH=$PATH:/usr/lpp/mmfs/bin
-mmchlicense server --accept -N `hostname`    # or  ${name}01
+sudo mmchlicense server --accept -N `hostname`    # or  ${name}01
 mmlscluster
 uptime
 
