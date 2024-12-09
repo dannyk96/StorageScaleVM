@@ -1,47 +1,54 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures !$ the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
+
 Vagrant.configure("2") do |config|
-  config.vm.provider "virtualbox" do |vbox|
-  #config.vm.box     = "centos/8"
-  config.vm.box     = "StorageScale_base"
-  # we will us ethe model that this box in the lcoal vagrant repository
-  # # config.vm.box_url = "../prep-box/StorageScale_base.box"
-    vbox.memory = 4192
-    vbox.cpus = 1
-  end
+   config.vm.provider "virtualbox" do |vbox|
+   #config.vm.box     = "centos/8"
+   config.vm.box     = "StorageScale_base"
+   # we will us ethe model that this box in the lcoal vagrant repository
+   # # config.vm.box_url = "../prep-box/StorageScale_base.box"
+     vbox.memory = 4192
+     vbox.cpus = 2
+   end
 
-  config.vm.define "csi", primary: true do |node|
-    node.vm.hostname = "wilma01"
-    # Management network
-    node.vm.network "private_network", ip: "10.1.1.21"    # 'eth1
-    # Data transfer networkM
-    node.vm.network "private_network", ip: "10.1.2.21"    # 'eth2
-  end
+   config.vm.define "csi", primary: true do |node|
+      node.vm.hostname = "wilma01.example.com"
+      # Management network
+      node.vm.network "private_network", ip: "10.1.1.21"    # 'eth1
+      # Data transfer networkM
+      node.vm.network "private_network", ip: "10.1.2.21"    # 'eth2
+   end
 
-  # config.vm.synced_folder "../setup", "/vagrant", type: "rsync"
-# Generate ssh keys for user root
-# Note: The Storage Scale installation toolkit requires root ssh
-config.vm.provision "shell",
-    name:   "Generate ssh keys for user root",
-    inline: "
-      ssh-keygen -q -N '' -m PEM -f /root/.ssh/id_rsa
-      cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
-      ssh-keyscan wilma01 >> /root/.ssh/known_hosts
-    "
+   # config.vm.synced_folder "../setup", "/vagrant", type: "rsync"
+   # Generate ssh keys for user root
+   # Note: The Storage Scale installation toolkit requires root ssh
+   config.vm.provision "shell",
+       name:   "Generate ssh keys for user root",
+       inline: "
+       ssh-keygen -q -N '' -m PEM -f /root/.ssh/id_rsa
+       cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+       ssh-keyscan wilma01 >> /root/.ssh/known_hosts
+     "
 
-  config.vm.synced_folder '.', '/vagrant', disabled: true       # we won't use this
-  # remember that we need to put teh Storage Scaler installer here:
-  config.vm.synced_folder "setup", "/tmp/setup", type: "rsync"  # conatins install.sh
+   config.vm.synced_folder '.', '/vagrant', disabled: true       # we won't use this
+   # remember that we need to put the Storage Scaler installer here:
+   config.vm.synced_folder "setup", "/tmp/setup", type: "rsync"  # conatins install.sh
 
+$script = <<-SCRIPT
+echo I am provisioning...
+date > /etc/vagrant_provisioned_at
+SCRIPT
 
-config.vm.provision "shell",
-    name:   "Now ssh in and run our install.sh",
-    inline: "
-      bash /tmp/setup/install.sh
-    "
+   config.vm.provision "shell",
+      # need to replace the script above with a cat <<EOF
+      name: "add /usr/local/bin to sudoers *before* we run our install.sh",
+      inline: $script
+
+   config.vm.provision "shell",
+      name: "Now ssh in and run our install.sh",
+      path: "setup/install.sh"
+      #inline: "
+      #  bash /tmp/setup/install.sh
+      #"
 end
