@@ -26,6 +26,7 @@ sudo dnf -y install unzip         # to unpack the Scale tarball
 #  not so sure wht we need this ?
 # I suspect it fixes a missing /usr/local/bin from PATH ?
 
+# I wonder if this needs to be done in a previous vagrant ssh  as otherwise /usr/local/bin is not available (to provide ansible-playbook)
 cat <<EOF | sudo tee -a /etc/sudoers.d/spectrumscale
 # Provisioned by Vagrant `date`
 
@@ -101,18 +102,22 @@ echo $LINE
 echo "===> Setup management node (m1) as Storage Scale Install Node"
 sudo $SS setup -s $INSTALL_NODE --storesecret
 
-sudo $SS config gpfs -c ${name}_site     # storage cluster  is already defined as 'demo' with node 'm1'
+# note storage cluster  is already defined as 'demo' with node 'm1'
+sudo $SS config gpfs -c ${name}_site.example.com        
+
+sudo $SS callhome disable       # disable to avoid supurious warnings
+
 # note one day I might want  -g - with gui to show client activity?
-sudo $SS node add -a -q -m ${name}01.example.com     # a=admin, q=quorum, m=manager
+#  -g == --gui, -n == --nsd,  
+#  -a == --admin,  -q== --quorum, -m == --manager
+sudo $SS node add --gui --admin --quorum --manager  ${name}01.example.com     # a=admin, q=quorum, m=manager
 
-
-sudo $SS callhome disable       # disbale to avoid supurious warnings
 
 echo "*** PATH=$PATH"
 echo "current user is `id`"
 sudo $SS node list
 # I think we are already root, but sudo picks up /usr/local/bin ?
-time sudo $SS install > install_scale.log
+time sudo $SS install -f > install_scale.log
 
 echo "check if the Installer succeeded in unpack the RPMS"
 if [-f /usr/lpp/mmfs/bin/mmstartup]; then
