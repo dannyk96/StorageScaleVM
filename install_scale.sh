@@ -69,12 +69,12 @@ sed -i.bak 's|/vagrant/demo/script.sh|#/vagrant/demo/script.sh|' Vagrantfile
 echo "*** We need to enable the GUI user here (was much later in demo/script-80,sh)"
 # so sed it into the end of install/script-05.sh (after sudo /usr/lpp/mmfs/gui/cli/initgui)
 #sed -i.bak -e '/initgui/ a\' -e 'sudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' StorageScaleVagrant/setup/install/script-05.sh
-printf '%s\n' /initgui/a 'sudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' . w q |ex -s StorageScaleVagrant/setup/install/script-05.sh
+printf '%s\n' /initgui/a 'sudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' . w q |ex -s ../setup/install/script-05.sh
 
 
 echo "*** redict the output of './spectrumscale install' to a file (as bloats STDOUT here)"
 #sed -i.bak -e '/spectrumscale install/ s/$/ > install.log/' StorageScaleVagrant/setup/install/script-05.sh
-printf '%s\n' '/spectrumscale install/' 's/$/ > install.log' . w q | ex -s StorageScaleVagrant/setup/install/script-05.sh
+printf '%s\n' '/spectrumscale install/' 's/$/ > install.log' . w q | ex -s ../setup/install/script-05.sh
 
 # Now we need to patch the file to point to this version of Storage Scale
 # StorageScaleVagrant/shared/Vagrantfile.common
