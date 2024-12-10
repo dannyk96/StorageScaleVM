@@ -3,20 +3,26 @@
 #set -e
 
 
-LINE="========================================================================================="
+#
+# Pretty print section titles
+#
+function section () {
+   echo " "
+   echo "==================================================================================================="
+   echo "`date +\%H:%M:%S`  $@"
+   echo "==================================================================================================="
+}
 
 #
 # Customisable settings
 #
-#VERSION=5.2.1.1                   # would be nice to detect this automatically?
+#VERSION=5.2.1.1                  # would be nice to detect this automatically?
 name="wilma"                      # the basename of both the cluster and this node
 INSTALL_NODE="10.1.1.21"          # FIXME  cf storage cluster is 10.1.1.11
 
 #-------  no user configurable options to go below this line -------
 
-echo $LINE
-echo "Install some extra rpms, update /etc/hosts, turn off swap"
-echo $LINE
+section " 1.Install some extra rpms, update /etc/hosts, turn off swap"
 
 
 # some extra RPMS
@@ -58,19 +64,15 @@ cat <<EOF  | sudo tee -a /etc/hosts
 EOF
 
 # default is 2GB. we want all the real memory we can get!
-sudo swapoff /swapfile
+#sudo swapoff /swapfile
 
 # we might want to look at this file later
 clusterdef=/usr/lpp/mmfs/${VERSION}/ansible-toolkit/ansible/vars/scale_clusterdefinition.json
 
 
-echo $LINE
-echo "*** Unpack the Storage Scale tarball"
-echo $LINE
+section " 2. Unpack the Storage Scale tarball"
 
-echo $LINE
-echo "Autodetect the version of Scale and unzip and auto-unpack the tarball"
-echo $LINE
+section " 2.1: Autodetect the version of Scale and unzip and auto-unpack the tarball"
 
 cd /tmp/setup
 
@@ -89,17 +91,16 @@ if [ ! -f $INSTALL ]; then
 fi 
 
 SS="/usr/lpp/mmfs/$VERSION/ansible-toolkit/spectrumscale"
-echo "unpack the tarball only if $SS does not yet exist"
+
+section "3. Unpack the tarball (only if $SS does not yet existi)"
+
 if [ ! -f $SS ]; then
    sudo bash ./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install  --silent >>tarball_unpack.log
 fi 
 
-echo $LINE
-echo " Configure the Storage Scale installer then run it"
-echo $LINE
+section " 4. Configure the Storage Scale installer"
 
 
-echo "===> Setup management node (m1) as Storage Scale Install Node"
 sudo $SS setup -s $INSTALL_NODE --storesecret
 
 # note storage cluster  is already defined as 'demo' with node 'm1'
@@ -116,13 +117,14 @@ sudo $SS node add --gui --admin --quorum --manager  ${name}01.example.com     # 
 echo "*** PATH=$PATH"
 echo "current user is `id`"
 sudo $SS node list
+ 
+section " 6: Run the Installer (can take quite a while)\nlogs to install_scale.log"
+
+#
 # I think we are already root, but sudo picks up /usr/local/bin ?
 time sudo $SS install -f > install_scale.log
 
-echo "check if the Installer succeeded in unpack the RPMS"
-if [-f /usr/lpp/mmfs/bin/mmstartup]; then
-  echo "*** Storage Scale binaries not found! exiting"
-fi
+#
 #
 # Now lets fire up Storage Scale !
 #
@@ -140,32 +142,24 @@ PATH=$PATH:/usr/local/bin
 # no need to deploy if we are only a client cluster as no disks, no CES etc.
 #time $SS deploy
 
-echo $LINE
-echo "start this one node cluster and do a few checks"
-echo $LINE
+#echo "check if the Ansible succeeded in unpack the RPMS"
+#if [ -f /usr/lpp/mmfs/bin/mmstartup ]; then
+#  echo "*** Storage Scale binaries not found! exiting"
+#fi
+
+section  "7: start this one node cluster and do a few checks"
+
 export PATH=$PATH:/usr/lpp/mmfs/bin
-sudo mmchlicense server --accept -N `hostname`    # or  ${name}01
 mmlscluster
+# I don't thinkl we need to do the next?
+#sudo mmchlicense server --accept -N `hostname`    # or  ${name}01
 uptime
 
 # TODO:
 #  the mmauth exchange but and hence mmmount the remote /gpfs/fs1
 #mmauth add
 
-echo $LINE
-echo "remote mount fronm the storage cluster vm"
-echo $LINE
 ping -c2 m1
 
-cat <<EOF
-1: cat /var/mmfs/ssl/id_rsa.pub and sent to m1 as  wilma_id_rsa.pub
-1: cat /var/mmfs/ssl/id_rsa.pub and sent to wilma as  m1_id_rsa.pub
-#
-#   mmremotecluster add demo.example.com -k m1_id_rsa.pub -n m1
-#
-# then on the storage cluster
-#
-2: mmauth grant wilma_site.example.com -f fs1
-   mmremotefs add fs1 -f fs1 -C demo.example.com -T /gpfs/fs1 -A yes
-   mmmount fs1
-EOF
+section "All Complete"
+
