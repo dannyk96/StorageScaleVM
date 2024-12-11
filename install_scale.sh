@@ -53,7 +53,8 @@ fi
 section "5. Customise this Vagrantfile"
 
 echo "*** add a line to use version \$VERSION=$VERSION of Scale"
-sed -i.bak "/StorageScale_version =/a\$StorageScale_version = \"$VERSION\"" ../shared/Vagrantfile.common
+#sed -i.bak "/StorageScale_version =/a\$StorageScale_version = \"$VERSION\"" ../shared/Vagrantfile.common
+printf '%s\n' /StorageScale_version/a "\$StorageScale_version = \"$VERSION\"" . w q |ex -s ../shared/Vagrantfile.common
 
 
 echo "*** change port 8888 to 4438 to avoid clash with Jupyter Notebooks"
@@ -75,6 +76,8 @@ printf '%s\n' /initgui/a 'sudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monit
 echo "*** redict the output of './spectrumscale install' to a file (as bloats STDOUT here)"
 #sed -i.bak -e '/spectrumscale install/ s/$/ > install.log/' StorageScaleVagrant/setup/install/script-05.sh
 printf '%s\n' '/spectrumscale install/' 's/$/ > install.log' . w q | ex -s ../setup/install/script-05.sh
+
+#exit
 
 # Now we need to patch the file to point to this version of Storage Scale
 # StorageScaleVagrant/shared/Vagrantfile.common
