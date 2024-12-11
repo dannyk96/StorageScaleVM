@@ -1,5 +1,7 @@
 #!/bin/bash
-
+# for debug
+set +x
+set -e
 
 #
 # Pretty print section titles
