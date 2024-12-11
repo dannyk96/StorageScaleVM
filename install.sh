@@ -14,7 +14,13 @@ function section () {
 # next if for Windows not MacOS
 PATH=$PATH:"/c/Program Files/Oracle/VirtualBox/"
 vboxmanage list vms 
-vboxmanage list hdds| grep -i location 
+#vboxmanage list hdds| grep -i location 
+
+# This is very useful if you missed seeing the port forwarding at the beginning of the vagrant launch
+# virtualbox_m1_1733833761918_7774
+# $ vboxmanage showvminfo virtualbox_m1_1733833761918_7774|grep Rule
+# NIC 1 Rule(0):   name = ssh, protocol = tcp, host ip = 127.0.0.1, host port = 2200, guest ip = , guest port = 22
+# NIC 1 Rule(1):   name = tcp4438, protocol = tcp, host ip = , host port = 4438, guest ip = , guest port = 443
 
 section "2 Install Vagrant from https://developer.hashicorp.com/vagrant/install?product_intent=vagrant"
 
