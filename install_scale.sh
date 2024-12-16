@@ -1,7 +1,8 @@
 #!/bin/bash
+#set -x # uncomment for debug
 
 # Recommended to run this in 'git bash' on Windows
-# If run under powershell, I think there is a conflict between windows linux subsystem and opensssl ?
+# If run under Mobaxterm or powershell, I think there is a conflict between windows linux subsystem and opensssl ?
 
 #
 # Pretty print section titles
@@ -16,6 +17,7 @@ function section () {
 section "1 Download the Vagrant sctipts from  https://github.com/IBM/StorageScaleVagrant.git"
 # Have the Vagrant scripts been downlaoded yet?
 if [ ! -d StorageScaleVagrant ]; then
+  (cd 
   git clone https://github.com/IBM/StorageScaleVagrant.git
 fi
 cd StorageScaleVagrant
@@ -27,10 +29,8 @@ section "2 Ccopy a download of Storage Scale Dedveloper edition"
 # Really we should be getting this zipfile direct from IBM ?
 #
 # better to read which zip file is in the base directory?
-VERSION="5.1.9.1"
-VERSION="5.2.0.1"
 # above probably lack mms3 ?
-VERSION="5.2.1.1"
+VERSION="5.2.2.0"
 BASE="Storage_Scale_Developer-${VERSION}-x86_64-Linux"
 
 
@@ -54,11 +54,13 @@ section "5. Customise this Vagrantfile"
 
 echo "*** add a line to use version \$VERSION=$VERSION of Scale"
 #sed -i.bak "/StorageScale_version =/a\$StorageScale_version = \"$VERSION\"" ../shared/Vagrantfile.common
-printf '%s\n' /StorageScale_version/a "\$StorageScale_version = \"$VERSION\"" . w q |ex -s ../shared/Vagrantfile.common
+# only need to do this if a newer versio nof Scale has come out (>5,2,1,1)
+#printf '%s\n' /StorageScale_version/a "\$StorageScale_version = \"$VERSION\"" . w q |ex -s ../shared/Vagrantfile.common
 
 
 echo "*** change port 8888 to 4438 to avoid clash with Jupyter Notebooks"
-sed -i.bak 's/host: 8888/host: 4438/' Vagrantfile
+echo "otherwise smply connect to https://10.1.2.11:47433/"
+#sed -i.bak 's/host: 8888/host: 4438/' Vagrantfile
 # or instead allow use the `auto_correct: true` option of config.vm.network ?
 
 
@@ -70,12 +72,13 @@ sed -i.bak 's|/vagrant/demo/script.sh|#/vagrant/demo/script.sh|' Vagrantfile
 echo "*** We need to enable the GUI user here (was much later in demo/script-80,sh)"
 # so sed it into the end of install/script-05.sh (after sudo /usr/lpp/mmfs/gui/cli/initgui)
 #sed -i.bak -e '/initgui/ a\' -e 'sudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' StorageScaleVagrant/setup/install/script-05.sh
-printf '%s\n' /initgui/a 'sudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' . w q |ex -s ../setup/install/script-05.sh
+# Harold has now added this to demo/script-01.sh but this imho is too late - should be in the setup/ section
+#printf '%s\n' /initgui/a 'sudo /usr/lpp/mmfs/gui/cli/mkuser performance -g Monitor -p monitor' . w q |ex -s ../setup/install/script-05.sh
 
 
 echo "*** redict the output of './spectrumscale install' to a file (as bloats STDOUT here)"
 #sed -i.bak -e '/spectrumscale install/ s/$/ > install.log/' StorageScaleVagrant/setup/install/script-05.sh
-printf '%s\n' '/spectrumscale install/' 's/$/ > install.log' . w q | ex -s ../setup/install/script-05.sh
+#printf '%s\n' '/spectrumscale install/' 's/$/ |tee install.log' . w q | ex -s ../setup/install/script-05.sh
 
 #exit
 
