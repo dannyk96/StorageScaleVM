@@ -15,14 +15,17 @@ These are some of the key objectives
    
          x Run each one on demand, possibly menu driven (Curses anyone?)
          x Run my own demos customised for the client's interests
+   
    2 Speed up the deployment time to be able to demonstate features as soon as possible by:
    
          x Have a reliable Basebox stored bentrally that I can build both servers and clients from.
          x Avoid repeating slow steps such as `spectrumscale {install, deploy} eg ny detecting that they have already been run
          x Enable to GUI as soon as it is deployed
          x (todo) create a Boxfile of the server VM so can spin up say the S3 demo very quickly. Also consider the use of VirtualBox snapshots here?
-         
-   2 Be able to demonstate as many data access protocols as possible. Also remote management
+   
+   3 Try and minimise any modifcation of `StorageScaleVagrant`. This is beause I don't want to risk incompatability as new drops of this come out every few months.  Currently the main think I change is to disable the automated running of the built-in demos.
+   
+   4 Be able to demonstate as many data access protocols as possible. Also remote management
      so far we have:
      
      x POSIX using native GPFS via Mulicluster
@@ -32,7 +35,43 @@ These are some of the key objectives
      x https RestAPI for management
      x (Todo) New role based access to the 'mm' commands
 
-     
+How to Use this repository
+--------------------------
+
+The only prerequisites are freely downloadable copies of
+
+    - VirtualBox
+    - Vagrant
+    - Spectrum Scale Developer edition tarball
+
+Firstly create the basbox which contains a copy of Centos/8 with added to the RPMs that Storage Scale depends on. We also install some nice to have RPMs like `unzip` and `jq`
+```
+./install_basebox.sh
+```
+Then we can install in either order the server
+```
+./install_scale.sh
+```
+and the client
+```
+./install_client.sh
+```
+Then the followign can be run in any order:
+```
+./setup_multicluster.sh
+
+./setup_mms3.sh
+
+./setup_nfs.sh
+'''
+
+Additional demos
+----------------
+
+'''
+ ./run_demos.sh
+'''
+    
      
 
 Some usefull Gems for Vagrant and VirtualBox enviroments.
