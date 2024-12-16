@@ -10,6 +10,19 @@ function section () {
    echo -e "`date +\%H:%M:%S`  $@"
    echo "==================================================================================================="
 }
+cat <<EOF
+section "2. Install Vagrant from https://developer.hashicorp.com/vagrant/install?product_intent=vagrant"
+section "3. Configure Vagrant for virtualbox"
+section "4. Install Virtualbox from https://www.virtualbox.org/wiki/Downloads"
+section "5. Install the Base VM image, including Scale\'s prerequisites"
+section "6. Install  a VM with Spectrum Scale"
+section "7. Install a client (using the same basebox VM image"
+section "8. Setup a multicluster mount betweeen the two clusters"
+section "9. Setup an S3 mount between the two clusters"
+section "10. Setup an NFS mount between the two clusters"
+section "11. Test the Rest API"
+EOF
+
 
 # next if for Windows not MacOS
 PATH=$PATH:"/c/Program Files/Oracle/VirtualBox/"
@@ -55,8 +68,18 @@ if [ ! $dryrun ]; then
 ./setup_multicluster.sh
 fi
 
+section "9. Setup an S3 mount between the two clusters"
+if [ ! $dryrun ]; then
+./setup_mms3.sh
+fi
 
-section "9. Test the Rest API"
+
+section "10. Setup an NFS mount between the two clusters"
+if [ ! $dryrun ]; then
+./setup_nfs.sh
+fi
+
+section "11. Test the Rest API"
 if [ ! $dryrun ]; then
 time ./test_restapi.sh
 fi
