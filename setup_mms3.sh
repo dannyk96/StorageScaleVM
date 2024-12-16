@@ -66,7 +66,7 @@ sudo openssl genpkey -algorithm RSA -out /tmp/tls.key;
 sudo openssl req -new -key /tmp/tls.key -out /tmp/tls.csr -config /tmp/san.cnf -subj "/CN=localhost";
 sudo openssl x509 -req -days 365 -in /tmp/tls.csr -signkey /tmp/tls.key -out /tmp/tls.crt -extfile /tmp/san.cnf -extensions req_ext;
 sudo mkdir -p /ibm/cesShared/ces/s3-config/certificates;
-sudo cp /tmp/{tls.key,tls.crt} /ibm/cesShared/ces/s3-config/certificates/;
+sudo cp /tmp/tls.{key,c.rt} /ibm/cesShared/ces/s3-config/certificates/;
 EOF
 )
 
@@ -132,6 +132,8 @@ CN = localhost
 subjectAltName = DNS:localhost,DNS:cesip.example.com
 EOF
 )
+echo "===> we didn't really need it after all!"
+sshc1 rm aws-cert/san.cnf
 
 
 
@@ -162,7 +164,7 @@ echo " "
 # I think the aws_ca_bundle isn't working : I still need the envvar
 sshc1 aws configure set aws_access_key_id     $AWS_ACCESS_KEY        --profile eric
 sshc1 aws configure set aws_secret_access_key $AWS_SECRET_KEY        --profile eric
-sshc1 aws configure set aws_ca_bundle /home/vagrant/aws-cert/cesip-example-com.pem  --profile eric
+sshc1 aws configure set ca_bundle /home/vagrant/aws-cert/cesip-example-com.pem  --profile eric
 sshc1 aws configure set endpoint_url https://cesip.example.com:6443  --profile eric
 
 section "7. Create a bucket and upload a file"
@@ -175,7 +177,7 @@ EOF
 
 echo "==> create from the client"
 sshc1  <<< $(cat <<EOF
-export AWS_CA_BUNDLE=/home/vagrant/aws-cert/cesip-example-com.pem
+#export AWS_CA_BUNDLE=/home/vagrant/aws-cert/cesip-example-com.pem  # now set via .aws/config
 aws --profile eric s3 mb s3://bremmen60 
 aws --profile eric s3 ls
 date
