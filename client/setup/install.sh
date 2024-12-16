@@ -9,7 +9,7 @@
 function section () {
    echo " "
    echo "==================================================================================================="
-   echo "`date +\%H:%M:%S`  $@"
+   echo -e "`date +\%H:%M:%S`  $@"
    echo "==================================================================================================="
 }
 
@@ -59,6 +59,9 @@ cat <<EOF  | sudo tee -a /etc/hosts
 # high bandwidth data network
 10.1.2.11  m1.example.com m1
 10.1.2.21  wilma01.example.com wilma01
+
+# S3 interface (floating)
+10.1.2.31  cesip.example.com cesip
 #### end ####
 
 EOF
@@ -67,7 +70,7 @@ EOF
 #sudo swapoff /swapfile
 
 # we might want to look at this file later
-clusterdef=/usr/lpp/mmfs/${VERSION}/ansible-toolkit/ansible/vars/scale_clusterdefinition.json
+#clusterdef=/usr/lpp/mmfs/${VERSION}/ansible-toolkit/ansible/vars/scale_clusterdefinition.json
 
 
 section " 2. Unpack the Storage Scale tarball"
@@ -78,7 +81,9 @@ cd /tmp/setup
 
 # I must check that this tarball exists and abort if it does not
 #
-TARBALL=`ls Storage_Scale_Developer*.zip`
+# get the higherst numbered version :-)
+#
+TARBALL=$(ls Storage_Scale_Developer*.zip|tail -1)
 echo "ls -l $TARBALL"
 if [ ! -f $TARBALL ]; then 
    echo "*** Tarball $TARBALL does not exist. Aborting!"
@@ -88,14 +93,18 @@ export VERSION=`echo $TARBALL |cut -d'-' -f2`
 INSTALL="./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install"
 if [ ! -f $INSTALL ]; then 
   unzip  $TARBALL
+  rm $TARBALL    # to save disk space
 fi 
 
 SS="/usr/lpp/mmfs/$VERSION/ansible-toolkit/spectrumscale"
 
 section "3. Unpack the tarball (only if $SS does not yet existi)"
 
+# if the unpack was successfull we will delete the large install executable
 if [ ! -f $SS ]; then
-   sudo bash ./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install  --silent >>tarball_unpack.log
+   if sudo bash ./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install  --silent >>tarball_unpack.log;then
+     sudo rm -f ./Storage_Scale_Developer-${VERSION}-x86_64-Linux-install
+   fi 
 fi 
 
 section " 4. Configure the Storage Scale installer"
@@ -122,8 +131,11 @@ section " 6: Run the Installer (can take quite a while)\nlogs to install_scale.l
 
 #
 # I think we are already root, but sudo picks up /usr/local/bin ?
-time sudo $SS install -f > install_scale.log
+time sudo $SS install -f |tee install_scale.log
 
+# if the GUI has been installed we need this
+sudo /usr/lpp/mmfs/gui/cli/mkuser performance -g Monitor -p monitor
+#
 #
 #
 # Now lets fire up Storage Scale !
