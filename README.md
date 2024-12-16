@@ -56,21 +56,34 @@ and the client
 ```
 ./install_client.sh
 ```
-Then the followign can be run in any order:
+Then the following can be run in any order:
 ```
 ./setup_multicluster.sh
 
 ./setup_mms3.sh
 
 ./setup_nfs.sh
-'''
+```
 
 Additional demos
 ----------------
 
+The original demo suite
 '''
  ./run_demos.sh
 '''
+
+My work (in progress) on teh Scale RestAPI
+```
+./install_restapi
+
+./test_restapi.ipynv
+```
+or directly
+```
+./test_restapi.sh
+```
+
     
      
 
