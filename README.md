@@ -12,9 +12,11 @@ These are some of the key objectives
     
    1 Automate the install of Storage ScaleVagrant including the: git download, basbox build, and build of the Storage Scale server
    Also I want to skip the automated running of the built-in demos so I can either:
+   
          x Run each one on demand, possibly menu driven (Curses anyone?)
          x Run my own demos customised for the client's interests
    2 Speed up the deployment time to be able to demonstate features as soon as possible by:
+   
          x Have a reliable Basebox stored bentrally that I can build both servers and clients from.
          x Avoid repeating slow steps such as `spectrumscale {install, deploy} eg ny detecting that they have already been run
          x Enable to GUI as soon as it is deployed
@@ -22,6 +24,7 @@ These are some of the key objectives
          
    2 Be able to demonstate as many data access protocols as possible. Also remote management
      so far we have:
+     
      x POSIX using native GPFS via Mulicluster
      x S3  using the AWS toolkiy and he new Nooba based S3 sever in Storage Scale CES
      x NFS : as standard client server
