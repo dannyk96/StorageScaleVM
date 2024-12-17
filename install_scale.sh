@@ -10,21 +10,21 @@
 function section () {
    echo " "
    echo "==================================================================================================="
-   echo "`date +\%H:%M:%S`  $@"
+   echo -e "`date +\%H:%M:%S`  $@"
    echo "==================================================================================================="
 }
 
-section "1 Download the Vagrant sctipts from  https://github.com/IBM/StorageScaleVagrant.git"
+section "1 Download the Vagrant scripts from  https://github.com/IBM/StorageScaleVagrant.git"
 # Have the Vagrant scripts been downlaoded yet?
+# node option of a 'git pull' too to get the latest changes
 if [ ! -d StorageScaleVagrant ]; then
-  (cd 
   git clone https://github.com/IBM/StorageScaleVagrant.git
 fi
 cd StorageScaleVagrant
 
 
 
-section "2 Ccopy a download of Storage Scale Dedveloper edition"
+section "2 Download a copy of Storage Scale Dedveloper edition"
 #
 # Really we should be getting this zipfile direct from IBM ?
 #
@@ -52,31 +52,31 @@ fi
 
 section "5. Customise this Vagrantfile"
 
-echo "*** add a line to use version \$VERSION=$VERSION of Scale"
+#echo "*** add a line to use version \$VERSION=$VERSION of Scale"
 #sed -i.bak "/StorageScale_version =/a\$StorageScale_version = \"$VERSION\"" ../shared/Vagrantfile.common
 # only need to do this if a newer versio nof Scale has come out (>5,2,1,1)
 #printf '%s\n' /StorageScale_version/a "\$StorageScale_version = \"$VERSION\"" . w q |ex -s ../shared/Vagrantfile.common
 
 
-echo "*** change port 8888 to 4438 to avoid clash with Jupyter Notebooks"
-echo "otherwise smply connect to https://10.1.2.11:47433/"
+#echo "*** change port 8888 to 4438 to avoid clash with Jupyter Notebooks"
+#echo "otherwise smply connect to https://10.1.2.11:47433/"
 #sed -i.bak 's/host: 8888/host: 4438/' Vagrantfile
 # or instead allow use the `auto_correct: true` option of config.vm.network ?
 
 
-echo "*** disable running of the demos after installing Scale"
+echo "===> disable running of the demos after installing Scale"
 # We will do this later one by one
 sed -i.bak 's|/vagrant/demo/script.sh|#/vagrant/demo/script.sh|' Vagrantfile
 
 
-echo "*** We need to enable the GUI user here (was much later in demo/script-80,sh)"
+#echo "*** We need to enable the GUI user here (was much later in demo/script-80,sh)"
 # so sed it into the end of install/script-05.sh (after sudo /usr/lpp/mmfs/gui/cli/initgui)
 #sed -i.bak -e '/initgui/ a\' -e 'sudo /usr/lpp/mmfs/gui/cli/mkuser performance -p monitor -g monitor' StorageScaleVagrant/setup/install/script-05.sh
 # Harold has now added this to demo/script-01.sh but this imho is too late - should be in the setup/ section
 #printf '%s\n' /initgui/a 'sudo /usr/lpp/mmfs/gui/cli/mkuser performance -g Monitor -p monitor' . w q |ex -s ../setup/install/script-05.sh
 
 
-echo "*** redict the output of './spectrumscale install' to a file (as bloats STDOUT here)"
+#echo "*** redict the output of './spectrumscale install' to a file (as bloats STDOUT here)"
 #sed -i.bak -e '/spectrumscale install/ s/$/ > install.log/' StorageScaleVagrant/setup/install/script-05.sh
 #printf '%s\n' '/spectrumscale install/' 's/$/ |tee install.log' . w q | ex -s ../setup/install/script-05.sh
 
@@ -98,24 +98,27 @@ vagrant destroy -f
 #if test -d disk; then
 #    rm -rf disk
 #fi
-pwd
+#pwd
 
 section "7 Run vagrant (and hence the Spectrum Scale installer"
 # I would prefer to do the dirction just of the ./spectrumscale install
 time vagrant up
 rc=$?
-#cd ../..
+if [ $? -ne 0]; exit
+
 
 section "8 Confirm that a Scale cluster has been created"
 
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i .vagrant/machines/*/virtualbox/private_key -p 2222 vagrant@127.0.0.1 mmlscluster
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i .vagrant/machines/*/virtualbox/private_key vagrant@10.1.2.11 mmlscluster
 
 if [ $rc == 0 ]; then
 cat <<EOF 
      now proceed with:
      - testing the GUI 
      - testing the RestAPI
-     - testing teh S3 put/get Interface
+     - testing the S3 put/get Interface
+     - testing CES NFS exports
+     - testing Multicluster GPFs mounts
      - running the provided demo.sh scripts (extra NSDs, etc.
 EOF
 fi
