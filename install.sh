@@ -1,14 +1,14 @@
 #!/bin/bash
 
-dryrun=.true.
+#dryrun=.true.
 #
 # Pretty print section titles
 #
 function section () {
    echo " "
-   echo "==================================================================================================="
+   echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
    echo -e "`date +\%H:%M:%S`  $@"
-   echo "==================================================================================================="
+   echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 }
 cat <<EOF
 section "2. Install Vagrant from https://developer.hashicorp.com/vagrant/install?product_intent=vagrant"
@@ -46,9 +46,11 @@ section "4. Install Virtualbox from https://www.virtualbox.org/wiki/Downloads"
 
 
 section "5. Install the Base VM image, including Scale\'s prerequisites"
+    (vagrant box list|grep StorageScale_base) || (
 if [ ! $dryrun ]; then
-time ./install_basebox.sh
+	time ./install_basebox.sh
 fi
+)
 
 
 section "6. Install  a VM with Spectrum Scale"
