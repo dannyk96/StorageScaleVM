@@ -59,16 +59,15 @@ EOF
 
 echo " "
 
-sshm1 <<< $(cat <<EOF
+sshm1 <<EOF
 ls -ld /tmp/san.cnf;
 sudo rm -f /tmp/tls.{key,csr,crt};
 sudo openssl genpkey -algorithm RSA -out /tmp/tls.key;
 sudo openssl req -new -key /tmp/tls.key -out /tmp/tls.csr -config /tmp/san.cnf -subj "/CN=localhost";
 sudo openssl x509 -req -days 365 -in /tmp/tls.csr -signkey /tmp/tls.key -out /tmp/tls.crt -extfile /tmp/san.cnf -extensions req_ext;
 sudo mkdir -p /ibm/cesShared/ces/s3-config/certificates;
-sudo cp /tmp/tls.{key,c.rt} /ibm/cesShared/ces/s3-config/certificates/;
+sudo cp /tmp/tls.{key,crt} /ibm/cesShared/ces/s3-config/certificates/;
 EOF
-)
 
 echo "==> change CES IP from 192.168.56.101 to 10.1.2.31"
 sshm1 sudo mmces address add --ces-node m1 --ces-ip 10.1.2.31
@@ -79,6 +78,10 @@ sshm1 sudo mmces service start s3;
 sleep 10 
 sshm1 "sudo mmces state show s3"
 
+
+echo "==> Show the satte of teh S£ service"
+sshm1 'sudo mms3 config list  --debug'
+# cf. https://www.ibm.com/docs/en/storage-scale/5.2.1?topic=reference-mms3-command
 
 section "2. On the server create a user account with mms3 "
 
@@ -93,7 +96,7 @@ sshm1  ls -ld /ibm/fs1/erics_buckets/
 
 section "3. Download and Install the 'aws' client on c1"
 
-sshc1 <<< $(cat <<EOF
+sshc1 <<EOF
 # only do this is /usr/local/bin/aws does not exist
 if /usr/local/bin/aws --version; then
    echo "/usr/local/bin/aws already exisis, skipping re-install"
@@ -108,7 +111,6 @@ else
    /usr/local/bin/aws --version
 fi
 EOF
-)
 
 section "4. Create ~/aws_cert file on the client"
 
@@ -116,7 +118,7 @@ section "4. Create ~/aws_cert file on the client"
 # If I delete aws-cert/san.cnf then it all stil works
 # ie I think all we need is the .pem public certificate
 sshc1 mkdir -p aws-cert
-sshc1 "cat > aws-cert/san.cnf" <<< $(cat <<EOF
+sshc1 "cat > aws-cert/san.cnf" <<EOF
 [req]
 req_extensions = req_ext
 distinguished_name = req_distinguished_name
@@ -131,7 +133,6 @@ CN = localhost
 # 'IP:<nsfs-server-ip>' includes an IP address. Replace '<nsfs-server-ip>' with the actual IP address of your S3 server.
 subjectAltName = DNS:localhost,DNS:cesip.example.com
 EOF
-)
 echo "===> we didn't really need it after all!"
 sshc1 rm aws-cert/san.cnf
 
@@ -170,21 +171,19 @@ sshc1 aws configure set endpoint_url https://cesip.example.com:6443  --profile e
 section "7. Create a bucket and upload a file"
 
 echo "==> create a alias on ~/.bashrc"
-sshc1 <<< $(cat <<EOF
+sshc1 <<EOF
 echo 'alias S3="aws --profile eric --endpoint https://cesip.example.com:6443 s3"' >> ~/.bashrc
 EOF
-)
 
 echo "==> create from the client"
-sshc1  <<< $(cat <<EOF
+sshc1  <<EOF
 #export AWS_CA_BUNDLE=/home/vagrant/aws-cert/cesip-example-com.pem  # now set via .aws/config
-aws --profile eric s3 mb s3://bremmen60 
+aws --profile eric s3 mb s3://bremmen 
 aws --profile eric s3 ls
 date
 aws --profile eric s3 cp /etc/hosts s3://bremen/etc_hosts_$(date +%H_%M_%S)
 aws --profile eric s3 ls s3://bremen --human-readable --color on --summarize
 EOF
-)
 
 echo "==> and compare on the server"
 sshm1 sudo ls -lrt /ibm/fs1/erics_buckets/bremen
