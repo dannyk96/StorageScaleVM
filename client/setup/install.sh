@@ -123,7 +123,7 @@ sudo $SS callhome disable       # disable to avoid supurious warnings
 sudo $SS node add --gui --admin --quorum --manager  ${name}01.example.com     # a=admin, q=quorum, m=manager
 
 
-echo "*** PATH=$PATH"
+echo "---> PATH=$PATH"
 echo "current user is `id`"
 sudo $SS node list
  
