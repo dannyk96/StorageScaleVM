@@ -28,159 +28,91 @@ function sshc1 () {
 
 
 cat << EOF
-This Scripts Set up the S3 API on both sides and tests:
+This Scripts Set up the NFS mount on both sides and tests:
 
-  1. On the server ceate SSL certificates and start the CES S3 service
-  2. On the server create a user account with mms3
-  3. Downlaod and Install the 'aws' client on c1
-  4. create ~/aws_cert file on the client
-  5. get the host certificate: tls.cert from the server and put in /home/vagrant/aws-cert/
-  6. Now need to get the two hashes from the last line of s3_access_Keys.txt to node c1
-  7. Create a bucket and upload a file
+   1. On the server enable NFS via CES servicer"
+   2. On the server create an NFS export "
+   3. On the the client create an NFS mount "
+   4. Upload a file"
 
 EOF
 
 
 
-section "1. On the server ceate SSL certificates and start the CES S3 service"
+section "1. On the server enable NFS via CES servicer"
 
-
-sshm1 "cat |tee  /tmp/san.cnf" <<< $(cat <<EOF
-[req]
-req_extensions = req_ext
-distinguished_name = req_distinguished_name
-
-[req_distinguished_name]
-CN = localhost
-
-[req_ext]
-subjectAltName = DNS:localhost,DNS:cesip.example.com
-EOF
+echo "===> We need to only do this if NFS is not yet enaabled"
+sshm1 <<EOF
+(sudo mmces service list | head -1 |grep NFS)  || (
+# next line is needed to avoid:
+#   "You cannot enable/disable any of the smb/nfs protocols because auth has been configured"
+sudo mmuserauth service remove --data-access-method file
+sudo /usr/lpp/mmfs/5.2.2.0/ansible-toolkit/spectrumscale enable nfs
+sudo /usr/lpp/mmfs/5.2.2.0/ansible-toolkit/spectrumscale deploy
+# This might be already done for us?
+# sudo mmces service enable NFS
 )
-
-echo " "
-
-sshm1 <<< $(cat <<EOF
-ls -ld /tmp/san.cnf;
-sudo rm -f /tmp/tls.{key,csr,crt};
-sudo openssl genpkey -algorithm RSA -out /tmp/tls.key;
-sudo openssl req -new -key /tmp/tls.key -out /tmp/tls.csr -config /tmp/san.cnf -subj "/CN=localhost";
-sudo openssl x509 -req -days 365 -in /tmp/tls.csr -signkey /tmp/tls.key -out /tmp/tls.crt -extfile /tmp/san.cnf -extensions req_ext;
-sudo mkdir -p /ibm/cesShared/ces/s3-config/certificates;
-sudo cp /tmp/{tls.key,tls.crt} /ibm/cesShared/ces/s3-config/certificates/;
 EOF
-)
 
-echo "==> change CES IP from 192.168.56.101 to 10.1.2.31"
-sshm1 sudo mmces address add --ces-node m1 --ces-ip 10.1.2.31
-
-echo "==> Now restart CES to pick up the new certificates"
-sshm1 sudo mmces service stop s3;
-sshm1 sudo mmces service start s3;
-sleep 10 
-sshm1 "sudo mmces state show s3"
+echo "===> Make sure the CES has the right floating IP address"
+sshm1 'sudo mmces address add --ces-ip 10.1.2.31'
 
 
-section "2. On the server create a user account with mms3 "
-
-#echo "caveat: by creating the account with uid/gid 1000 will make the files owned by user 'vagrant'"
-# note that we do not need to create /home/eric
-sshm1 sudo groupadd -g 1010 s3_users 
-sshm1 sudo useradd  -g 1010 -u 1010 -c 'S3 user' eric
-sshm1 sudo mms3 account create eric --gid 1010 --uid 1010 --newBucketsPath /ibm/fs1/erics_buckets 
-
-echo "==> Show that a bucket directory has been created with the correct uid/gid"
-sshm1  ls -ld /ibm/fs1/erics_buckets/
-
-section "3. Download and Install the 'aws' client on c1"
-
-sshc1 <<< $(cat <<EOF
-# only do this is /usr/local/bin/aws does not exist
-if /usr/local/bin/aws --version; then
-   echo "/usr/local/bin/aws already exisis, skipping re-install"
-else
-   echo "==> installing AWS CLI v2"
-   cd /tmp
-   sudo curl -s https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip
-   #dnf -y install unzip
-   sudo unzip -o awscliv2.zip 2>&1 >/dev/null 
-   # cdaws
-   sudo /tmp/aws/install --update
-   /usr/local/bin/aws --version
-fi
-EOF
-)
-
-section "4. Create ~/aws_cert file on the client"
-
-sshc1 mkdir -p aws-cert
-sshc1 "cat > aws-cert/san.cnf" <<< $(cat <<EOF
-[req]
-req_extensions = req_ext
-distinguished_name = req_distinguished_name
-[req_distinguished_name]
-CN = localhost
-[req_ext]
-# The subjectAltName line directly specifies the domain names and IP addresses that the certificate should be valid for.
-# This ensures the SSL certificate matches the domain or IP used in your S3 command.
-# Example:
-# 'DNS:localhost' makes the certificate valid when accessing S3 storage via 'localhost'.
-# 'DNS:cess3-domain-name-example.com' adds a specific domain to the certificate. Replace 'cess3- domain-name-example.com' with your actual domain.
-# 'IP:<nsfs-server-ip>' includes an IP address. Replace '<nsfs-server-ip>' with the actual IP address of your S3 server.
-subjectAltName = DNS:localhost,DNS:cesip.example.com
-EOF
-)
+echo "===> now start the NFS servic2"
+sshm1 sudo mmces service start NFS
 
 
 
-section "5. Get the host certificate: tls.cert from the server and put in /home/vagrant/aws-cert/"
+section "2. On the server create an NFS export "
 
-# I can also get this certifcate from a curl to https://10.2.1.31:6443
-#
-# compare with doing this from anywhere:
-#
-# #echo "Q" | openssl  s_client -showcerts -servername 10.1.2.31 -connect 10.1.2.31:6443|openssl x509
+echo "===> choose local authentication  (or NIS or ADi) "
+#sshm1 mmuserauth service create --type local --data-access-method file
+sshm1 sudo mmuserauth service create --data-access-method file  --type userdefined
 
-sshc1 "cat |tee aws-cert/tls.crt" <<<\
-	$(ssh m1 sudo cat /ibm/cesShared/ces/s3-config/certificates/tls.crt)
-# note that the location isn't special. we have a shell variable $AWS_CA_BUNDLE that poitns to it
+echo "===> Check authentiation method is defined"
+sshm1 sudo mmuserauth service check
+
+echo "===> Now create the NFS export"
+sshc1 sudo umount /nfs/fs1 --force
+sshm1 sudo mmnfs export remove /ibm/fs1
+sshm1 'sudo mmnfs export add /ibm/fs1 --client "10.1.2.0/24(Access_Type=RW)"'
+
+echo "===> Create a directory that the client can write to"
+# This perhaps should have been part of the original Vagrantfilei (./install_scale.sh)
+sshm1 sudo mkdir -p /ibm/fs1/vagrant
+sshm1 sudo chown vagrant:vagrant /ibm/fs1/vagrant
+
+echo "===> show all exports"
+sshm1 sudo mmnfs export list
+
+section "3. On the the client create an NFS mount "
+
+echo "===> Create an /etc/fstab entry"
+# ideally we should delete any existing entries first?
+# using sed or ex
+sshc1 sudo sed -i.bak "/cesip.example.com/g"
+sshc1 'echo  "cesip.example.com:/ibm/fs1      /nfs/fs1    nfs     defaults 0 0" |sudo tee -a /etc/fstab'
+
+echo "===> Create and chmod the mountpoint"
+sshc1 sudo mkdir -p /nfs/fs1
+sshc1 sudo chmod 777 /nfs/fs1
+
+echo "===> Perform the remote mount"
+sshc1 sudo mount /nfs/fs1
 
 
-
-section "6. Now need to get the two hashes from the last line of s3_access_Keys.txt to node c1 "
-
-# is there a timeout on the next or could it hang if mmces returns an error?
-read -r name bucketpath uid gid AWS_ACCESS_KEY AWS_SECRET_KEY  <<< $(ssh m1 sudo mms3 account list eric |tail -1)
-echo " "
-echo "$bucketpath for user ${name}(uid=${uid},gid=${gid}) has keys  $AWS_ACCESS_KEY and $AWS_SECRET_KEY"
-echo " "
-
-sshc1 aws configure set aws_access_key_id     $AWS_ACCESS_KEY --profile eric
-sshc1 aws configure set aws_secret_access_key $AWS_SECRET_KEY --profile eric
-# why this?
-#sshc1 sudo cp -r /root/.aws /home/vagrant
-#sshc1 sudo chown -R vagrant:vagrant /home/vagrant/.aws
-#cd ..
-#sudo chown -R vagrant:vagrant aws-cert
-
-
-section "7. Create a bucket and upload a file"
-
+section "4. Upload a file"
 
 echo "==> create from the client"
-sshc1 <<< $(cat << EOF
-export S3="AWS_CA_BUNDLE=/home/vagrant/aws-cert/tls.crt aws --profile eric --endpoint https://cesip.example.com:6443 s3"
-echo "${S3}"
-env $S3 mb s3://bremen
-env $S3 ls
-env $S3 cp /etc/hosts s3://bremen/etc_hosts_$(date +%H_%M_%S)
+# be careful if user vagrant cannot create /nfs/fs1/vagrant ?
+sshc1 << EOF
+mkdir -p /nfs/fs1/vagrant/cologne
+cp /etc/hosts /nfs/fs1/vagrant/cologne/hosts_$(date +%H_%M_%S)
 date
-env $S3 ls s3://bremen --human-readable --color on --summarize
 EOF
-)
 
 echo "==> and compare on the server"
-sshm1 sudo ls -lrt /ibm/fs1/erics_buckets/bremen
+sshm1 sudo ls -lrt /ibm/fs1/vagrant/*
 
 section "All done"
 
