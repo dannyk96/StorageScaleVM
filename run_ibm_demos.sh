@@ -46,6 +46,7 @@ cat << EOF
 EOF
 
 
+/c/Program Files/Oracle/VirtualBox/vboxmanage list vms
 
 section "1.  Make a few changes to the scripts"
 echo "** script-81   switch off excessive verosity"
@@ -53,10 +54,9 @@ echo "** script-81   switch off excessive verosity"
 #printf '%s\n' '/Create files to exceed warning threshold/a' 'set +x' . w q | ex -s StorageScaleVagrant/setup/demo/script-81.sh
 
 
-exit
 
 section "2.   Run the demo suite"
-# should I delete these 2 public keys to make sure I get fresh ones?
+
 sshm1 'sudo /vagrant/demo/script.sh VirtualBox'
 
 

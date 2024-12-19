@@ -178,7 +178,7 @@ EOF
 echo "==> create from the client"
 sshc1  <<EOF
 #export AWS_CA_BUNDLE=/home/vagrant/aws-cert/cesip-example-com.pem  # now set via .aws/config
-aws --profile eric s3 mb s3://bremmen 
+aws --profile eric s3 mb s3://bremen 
 aws --profile eric s3 ls
 date
 aws --profile eric s3 cp /etc/hosts s3://bremen/etc_hosts_$(date +%H_%M_%S)

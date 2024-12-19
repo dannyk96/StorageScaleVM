@@ -104,14 +104,13 @@ section "7 Run vagrant (and hence the Spectrum Scale installer"
 # I would prefer to do the dirction just of the ./spectrumscale install
 time vagrant up
 rc=$?
-if [ $? -ne 0]; exit
+[ $? -eq 0] || exit
 
 
 section "8 Confirm that a Scale cluster has been created"
 
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i .vagrant/machines/*/virtualbox/private_key vagrant@10.1.2.11 mmlscluster
 
-if [ $rc == 0 ]; then
 cat <<EOF 
      now proceed with:
      - testing the GUI 
@@ -121,6 +120,5 @@ cat <<EOF
      - testing Multicluster GPFs mounts
      - running the provided demo.sh scripts (extra NSDs, etc.
 EOF
-fi
 
 

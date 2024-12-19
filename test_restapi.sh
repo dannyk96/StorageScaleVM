@@ -6,26 +6,65 @@
 #
 
 auth="performance:monitor"
-base="-s -k -u $auth https://127.0.0.1:4438/scalemgmt/v2"
+base="-s -k -u $auth https://10.1.2.11:47443/scalemgmt/v2"
 s="%20"
 #
 # Pretty primt section titles
 #
 function section () {
    echo " "
-   echo "***"
-   echo "*** $@"
-   echo "***"
+   echo "==================================================================================================="
+   echo -e "`date +\%H:%M:%S`  $@"
+   echo "==================================================================================================="
 }
 
+section "00 Get the API Token (so dont need username/password with Curl"
+
+curl ${base}/rest/auth
+
 section "1. List the filesytems"
-curl ${base}/filesystems |jq .filesystems[].name
+
+echo "===> First raw json output"
+curl ${base}/filesystems 
+
+echo -e  "\n===> now filter the output to get a list of filesystems"
+filesystems=$(curl ${base}/filesystems |jq -r -c  .filesystems[].name | sed 's/\n/z/g')
+#filesystems=$(curl ${base}/filesystems |jq -r  .filesystems[].name)
+echo "The filesystems found are:" $filesystems
+
+echo -e "\n===> Now get details of each filesystem"
+for fs in $filesystems
+do
+    #echo "fs = $fs  foo"
+    output=$(curl ${base}/filesystems/${fs})
+    #echo $output |jq
+    createTime=$(echo $output |jq -r .filesystems[0].createTime)
+    mountPoint=$(echo $output |jq -r .filesystems[0].mount.mountPoint)
+    printf "%-10s %-22s %12s %12s \n" $fs $mountPoint $createTime
+done
+
+
+section "2. List the restAPi endpoints"
+
+echo "===> All endpoints"
+curl ${base}/info | grep -i date
+exit
+
+echo "===> List just the filesytem endpoints"
+curl ${base}/info | grep "filesystems\/" |head
+
+
+section "3. Where to find doumentation"
+
+curl https://10.1.2.11/ibm/api/explorer  head -12
 
 section "4.1 Perforamnce Monitoring"
 #curl ${base}/perfmon/sensors | jq '.sensorConfig[] | "\(.sensorName)  \(.description)"' | head -2
 curl ${base}/perfmon/sensors | jq '.sensorConfig[] | .sensorName + "...." + .description' | head -2
 
 section "4.3 Query Perfmon for Free Memory over the last 5 hours"
+curl ${base}/filesystem.fs1
+
 
 #  check cluster health
 #  tbc
@@ -39,7 +78,7 @@ section "4.3 Query Perfmon for Free Memory over the last 5 hours"
 #curl ${base}/perfmon/data?query=metrics%20mem_memfree%20last%202%20bucket_size%207200
 query="metrics mem_memfree last 2 bucket_size 7200"
 metrics=$(echo $query |sed -e 's/ /%20/g') 
-curl ${base}/perfmon/data?query=${metrics}
+curl ${base}/perfmon/data?query=${metrics}| head -12
 
 
 
